@@ -34,7 +34,7 @@ function manualFollow() {
 	console.log('will follow the redirect')
 	electron.session.defaultSession.cookies.get({url}, (error, cookies) => {
 	    const cstring = cookies.map(c => `${c.name}=${c.value}`).join(';')
-	    request.setHeader('Cookie', cstring)
+	    //request.setHeader('Cookie', cstring) This should work.
 	    request.followRedirect()
 	})
     })
