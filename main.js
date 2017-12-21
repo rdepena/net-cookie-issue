@@ -11,7 +11,45 @@ const url = require('url')
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow
 
+function manualFollow() {
+    const url = 'http://localhost:9001/';
+    const request = electron.net.request({ url, redirect: 'manual'})
+
+    console.log('will create a request now')
+    request.once('response', (response) => {
+	response.on('data', (data) => {
+	    console.log(`Body: ${data}`)
+	})
+
+	response.on('end', () => {
+	    console.log('Manual follow request done')
+	})
+    })
+
+    request.on('error', (err) => {
+	console.log(err)
+    })
+
+    request.on('redirect', (statusCode, method, redirectUrl, responseHeaders) => {
+	console.log('will follow the redirect')
+	electron.session.defaultSession.cookies.get({url}, (error, cookies) => {
+	    const cstring = cookies.map(c => `${c.name}=${c.value}`).join(';')
+	    request.setHeader('Cookie', cstring)
+	    request.followRedirect()
+	})
+    })
+
+    request.end()
+}
+
+function runTests() {
+    createWindow()
+    manualFollow()
+}
+
 function createWindow () {
+    
+    
   // Create the browser window.
   mainWindow = new BrowserWindow({width: 800, height: 600})
 
@@ -37,7 +75,7 @@ function createWindow () {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on('ready', createWindow)
+app.on('ready', runTests)
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function () {
@@ -48,13 +86,8 @@ app.on('window-all-closed', function () {
   }
 })
 
-app.on('activate', function () {
-  // On OS X it's common to re-create a window in the app when the
-  // dock icon is clicked and there are no other windows open.
-  if (mainWindow === null) {
-    createWindow()
-  }
-})
-
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
+
+
+
