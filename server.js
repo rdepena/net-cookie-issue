@@ -6,7 +6,7 @@ app.use(cookieParser())
 
 app.get('/', (req, res) => {
     res.cookie('whateverCookie', 'ValueValue', { maxAge: 1000 * 60 * 15 })
-    res.cookie('anotherCookie', 'Value2', { maxAge: 1000 * 60 * 15 });
+    res.cookie('anotherCookie', 'Value2', { maxAge: 1000 * 60 * 15 })
     res.redirect('/stuff')
 })
 
